@@ -8,7 +8,14 @@ var expressHbs = require("express-handlebars");
 var logger = require("morgan");
 var mongoose = require("mongoose");
 var path = require("path");
+var session = require('express-session');
+var passport = require('passport');
+var flash = require('connect-flash');
+var validator = require('express-validator');
+
 var app = express();
+
+var routes = require('./routes/index');
 // view engine setup
 app.engine(".hbs", expressHbs({defaultLayout: "layout", extname: ".hbs"}));
 app.set("view engine", ".hbs");
@@ -20,6 +27,9 @@ mongoose.connect(mongoDB_URI, {useNewUrlParser: true});
 mongoose.connection.once("open", () => {
   console.log("Connected to Mongoose.");
 });
+require('./config/passport');
+
+
 // ==========================
 // Fix Deprecation Warnings
 // ==========================
@@ -31,10 +41,14 @@ mongoose.set("useCreateIndex", true);
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+// app.use(validator());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
-var indexRouter = require("./routes/index");
-app.use("/", indexRouter);
+app.use(session({secret: 'mysupersecret', resave: false, saveUnitialized: false}));
+app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
+app.use("/", routes);
 // ==========================
 // Error Handlers
 // ==========================
