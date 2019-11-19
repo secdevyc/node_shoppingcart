@@ -15,7 +15,8 @@ var validator = require('express-validator');
 
 var app = express();
 
-var routes = require('./routes/index');
+var routes = require('./routes/index.js');
+var userRoutes = require('./routes/user.js');
 // view engine setup
 app.engine(".hbs", expressHbs({defaultLayout: "layout", extname: ".hbs"}));
 app.set("view engine", ".hbs");
@@ -48,7 +49,15 @@ app.use(session({secret: 'mysupersecret', resave: false, saveUnitialized: false}
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use((req, res, next) => {
+  res.locals.login = req.isAuthenticated();
+  next();
+})
+
+app.use('/user', userRoutes)
 app.use("/", routes);
+
 // ==========================
 // Error Handlers
 // ==========================
