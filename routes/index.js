@@ -17,5 +17,8 @@ router.get("/", function(req, res, next) {
   });
 });
 
+router.get('/add-to-cart/:id', (req, res, next) => {
+  var productId = req.params.id;
+})
 /* Export */
 module.exports = router;
